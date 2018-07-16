@@ -1,0 +1,33 @@
+.container-fluid {
+	background-color: #15181c;
+	color: white;
+	margin-top: -48px;
+	padding-top: 48px;
+}
+
+html, body, .container-fluid{
+	height: 100%;
+	width: 100%;
+}
+
+.row, .col-12 {
+	height: 100%;
+	overflow: hidden;
+}
+
+.responsive-img {
+	max-height: 100%;
+	max-width: 100%;
+}
+
+.controlPanel {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    text-align: center;
+    visibility: hidden;
+}
+
+.btn-group {
+	visibility: visible;
+}
