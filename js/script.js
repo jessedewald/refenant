@@ -1,8 +1,8 @@
 var constants = {
-    numNonnudeLandscape: 10,
-    numNudeLandscape: 10,
-    numNonnudePortrait: 10,
-    numNudePortrait: 10 //playcode.io
+	numNonnudeLandscape: 10,
+	numNudeLandscape: 10,
+	numNonnudePortrait: 10,
+	numNudePortrait: 10 //playcode.io
 };
 var settings = {};
 var session = {};
@@ -14,6 +14,7 @@ function initSetup() {
 	// initalize settings
 	settings.nude = false;
 	settings.portrait = false;
+	settings.sessionTypeID = "00";
 	settings.minutes = 5;
 	settings.seconds = 0;
 	settings.delay = 5*60
@@ -36,20 +37,23 @@ function initSlideshow() {
 	settings.minutes = parseInt(document.getElementById("minutes").value);
 	settings.seconds = parseInt(document.getElementById("seconds").value);
 	settings.delay = settings.minutes * 60 + settings.seconds
+	var nudeFlag = settings.nude ? 1 : 0;
+	var portraitFlag = settings.portrait ? 1 : 0;
+	settings.sessionTypeID = (nudeFlag + "" + portraitFlag)
 
 
-    // initialize session values
-    session.index = 0
-    if (settings.nude) {
-        if (settings.portrait) session.queue = newQueue(constants.numNudePortrait);
-        else session.queue = newQueue(constants.numNudeLandscape);
-    }
-    else {
-        if (settings.portrait) session.queue = newQueue(constants.numNonnudePortrait);
-        else session.queue = newQueue(constants.numNonnudeLandscape);
-    }
+	// initialize session values
+	session.index = 0
+	if (settings.nude) {
+		if (settings.portrait) session.queue = newQueue(constants.numNudePortrait);
+		else session.queue = newQueue(constants.numNudeLandscape);
+	}
+	else {
+		if (settings.portrait) session.queue = newQueue(constants.numNonnudePortrait);
+		else session.queue = newQueue(constants.numNonnudeLandscape);
+	}
 
-    // load slideshow content and add event listeners
+	// load slideshow content and add event listeners
 	$("#nav").load("content/navSession.html");
 	$("#content").load("content/contentSession.html", function() {
 		loadNextImage();
@@ -117,12 +121,15 @@ function newQueue(length) {
 }
 
 function loadNextImage() {
+
 	// set time remaining to user-chosen delay
 	session.time = settings.delay;
+
 	// inital render
 	console.log("image index: " + session.index);
 	console.log(session.time);
-	var imgstr = "img/00/" + session.queue[session.index] + ".jpg";
+	drawTime();
+	var imgstr = "img/" + settings.sessionTypeID + "/" + session.queue[session.index] + ".jpg";
 	$("#imgContent").attr("src",imgstr);
 	// begin clock ticking
 	session.timer = setInterval(tick,1000);
@@ -131,6 +138,7 @@ function loadNextImage() {
 function tick() {
 	if (session.time > 0) { // if time is left on image
 		console.log(--session.time); // decrement and rerender
+		drawTime();
 	}
 	else { // (timer ran out)
 		forward();
@@ -155,4 +163,11 @@ function pause() {
 
 function resume() {
 	session.timer = setInterval(tick,1000);
+}
+
+function drawTime() {
+	var minutes = Math.floor(session.time / 60);
+	var seconds = session.time % 60;
+	if (seconds < 10) seconds = "0" + seconds;
+	$("#time").text(minutes + ":" + seconds);
 }
