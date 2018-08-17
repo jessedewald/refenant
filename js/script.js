@@ -1,8 +1,8 @@
 var constants = {
 	numNonnudeLandscape: 10,
 	numNudeLandscape: 10,
-	numNonnudePortrait: 10,
-	numNudePortrait: 10 //playcode.io
+	numNonnudePortrait: 5,
+	numNudePortrait: 5
 };
 var settings = {};
 var session = {};
@@ -130,6 +130,7 @@ function loadNextImage() {
 	console.log(session.time);
 	drawTime();
 	var imgstr = "img/" + settings.sessionTypeID + "/" + session.queue[session.index] + ".jpg";
+	$("#imgContent").attr("src","");
 	$("#imgContent").attr("src",imgstr);
 	// begin clock ticking
 	session.timer = setInterval(tick,1000);
@@ -158,11 +159,11 @@ function backward() {
 }
 
 function pause() {
-	clearInterval(session.timer);
+	clearInterval(session.timer); // pause ticking
 }
 
 function resume() {
-	session.timer = setInterval(tick,1000);
+	session.timer = setInterval(tick,1000); // resume ticking
 }
 
 function drawTime() {
