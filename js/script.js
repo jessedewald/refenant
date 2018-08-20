@@ -1,8 +1,8 @@
 var constants = {
 	numNonnudeLandscape: 10,
-	numNudeLandscape: 10,
-	numNonnudePortrait: 5,
-	numNudePortrait: 5
+	numNudeLandscape: 5,
+	numNonnudePortrait: 10,
+	numNudePortrait: 6
 };
 var settings = {};
 var session = {};
@@ -27,6 +27,7 @@ function initSetup() {
 		document.getElementById("landscape").addEventListener("click", function () {settingHandler(1,0);});
 		document.getElementById("portrait").addEventListener("click", function () {settingHandler(1,1);});
 		document.getElementById("begin").addEventListener("click", initSlideshow);
+		$('[data-toggle="popover"]').popover() // init "about" popover
 	});
 };
 
@@ -36,10 +37,13 @@ function initSlideshow() {
 	// finalizing settings values
 	settings.minutes = parseInt(document.getElementById("minutes").value);
 	settings.seconds = parseInt(document.getElementById("seconds").value);
+	if (isNaN(settings.minutes)) settings.minutes = 5;
+	if (isNaN(settings.seconds)) settings.seconds = 0;
 	settings.delay = settings.minutes * 60 + settings.seconds
 	var nudeFlag = settings.nude ? 1 : 0;
 	var portraitFlag = settings.portrait ? 1 : 0;
 	settings.sessionTypeID = (nudeFlag + "" + portraitFlag)
+	session.isTicking = true;
 
 
 	// initialize session values
@@ -59,6 +63,10 @@ function initSlideshow() {
 		loadNextImage();
 		document.getElementById("forward").addEventListener("click",forward);
 		document.getElementById("backward").addEventListener("click",backward);
+		document.getElementById("pause").addEventListener("click",pause);
+		document.getElementById("end").addEventListener("click", function(){
+			location.reload();
+		});
 	});
 };
 
@@ -132,8 +140,9 @@ function loadNextImage() {
 	var imgstr = "img/" + settings.sessionTypeID + "/" + session.queue[session.index] + ".jpg";
 	$("#imgContent").attr("src","");
 	$("#imgContent").attr("src",imgstr);
+
 	// begin clock ticking
-	session.timer = setInterval(tick,1000);
+	resume();
 }
 
 function tick() {
@@ -149,21 +158,35 @@ function tick() {
 function forward() {
 	clearInterval(session.timer); // end current timer
 	session.index++; // increment index
+	if (session.index >= session.queue.length) session.index = 0; // loop to beginning of queue
 	loadNextImage(); // refresh
 }
 
 function backward() {
 	clearInterval(session.timer); // end current timer
 	session.index--; // decrement index
+	if (session.index < 0) session.index = session.queue.length-1; // loop to end of queue
 	loadNextImage(); // refresh
 }
 
 function pause() {
 	clearInterval(session.timer); // pause ticking
+	session.isTicking = false;
+	document.getElementById("pause").firstElementChild.classList.remove("fa-pause");
+	document.getElementById("pause").firstElementChild.classList.add("fa-play");
+	document.getElementById("pause").removeEventListener("click",pause);
+	document.getElementById("pause").addEventListener("click",resume);
 }
 
 function resume() {
 	session.timer = setInterval(tick,1000); // resume ticking
+	if (!session.isTicking) { // if resuming after a user pause, restore pause button to navbar
+		session.isTicking = true;
+		document.getElementById("pause").firstElementChild.classList.remove("fa-play");
+		document.getElementById("pause").firstElementChild.classList.add("fa-pause");
+		document.getElementById("pause").removeEventListener("click",resume);
+		document.getElementById("pause").addEventListener("click",pause);
+	}
 }
 
 function drawTime() {
