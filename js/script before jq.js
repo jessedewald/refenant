@@ -9,7 +9,7 @@ var constants = { // number of images in each category
 var settings = {};
 var session = {};
 
-$(initSetup);
+window.addEventListener("load",initSetup);
 
 function initSetup() {
 	// populates page with controls for settings and adds event listeners to respond to input
@@ -27,11 +27,11 @@ function initSetup() {
 		$('[data-toggle="popover"]').popover() // init "about" popover
 	});
 	$("#content").load("content/contentSetup.html", function() {
-		$("#non-nude").click(function () {settingHandler(0,0)});
-		$("#nude").click(function () {settingHandler(0,1)});
-		$("#landscape").click(function () {settingHandler(1,0)});
-		$("#portrait").click(function () {settingHandler(1,1)});
-		$("#begin").click(initSlideshow);
+		document.getElementById("non-nude").addEventListener("click", function () {settingHandler(0,0);});
+		document.getElementById("nude").addEventListener("click", function () {settingHandler(0,1);});
+		document.getElementById("landscape").addEventListener("click", function () {settingHandler(1,0);});
+		document.getElementById("portrait").addEventListener("click", function () {settingHandler(1,1);});
+		document.getElementById("begin").addEventListener("click", initSlideshow);
 	});
 };
 
@@ -65,10 +65,10 @@ function initSlideshow() {
 	$("#nav").load("content/navSession.html", function() {
 		$("#content").load("content/contentSession.html", function() {
 			loadNextImage();
-			$("#forward").click(forward);
-			$("#backward").click(backward);
-			$("#pause").click(pause);
-			$("#end").click(function () {
+			document.getElementById("forward").addEventListener("click",forward);
+			document.getElementById("backward").addEventListener("click",backward);
+			document.getElementById("pause").addEventListener("click",pause);
+			document.getElementById("end").addEventListener("click", function(){
 				location.reload();
 			});
 		});
@@ -176,12 +176,11 @@ function backward() {
 
 function pause() {
 	clearInterval(session.timer); // pause ticking
-	console.log("pause");
 	session.isTicking = false;
 	document.getElementById("pause").firstElementChild.classList.remove("fa-pause");
 	document.getElementById("pause").firstElementChild.classList.add("fa-play");
-	$("#pause").off("click");
-	$("#pause").click(resume);
+	document.getElementById("pause").removeEventListener("click",pause);
+	document.getElementById("pause").addEventListener("click",resume);
 }
 
 function resume() {
@@ -190,8 +189,8 @@ function resume() {
 		session.isTicking = true;
 		document.getElementById("pause").firstElementChild.classList.remove("fa-play");
 		document.getElementById("pause").firstElementChild.classList.add("fa-pause");
-		$("#pause").off("click");
-		$("#pause").click(pause);
+		document.getElementById("pause").removeEventListener("click",resume);
+		document.getElementById("pause").addEventListener("click",pause);
 	}
 }
 
