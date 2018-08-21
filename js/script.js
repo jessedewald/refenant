@@ -1,4 +1,6 @@
-var constants = {
+(function() {
+
+var constants = { // number of images in each category
 	numNonnudeLandscape: 10,
 	numNudeLandscape: 5,
 	numNonnudePortrait: 10,
@@ -6,6 +8,7 @@ var constants = {
 };
 var settings = {};
 var session = {};
+
 window.addEventListener("load",initSetup);
 
 function initSetup() {
@@ -20,14 +23,15 @@ function initSetup() {
 	settings.delay = 5*60
 
 	// load setup page content and add event listeners to buttons
-	$("#nav").load("content/navSetup.html");
+	$("#nav").load("content/navSetup.html", function() {
+		$('[data-toggle="popover"]').popover() // init "about" popover
+	});
 	$("#content").load("content/contentSetup.html", function() {
 		document.getElementById("non-nude").addEventListener("click", function () {settingHandler(0,0);});
 		document.getElementById("nude").addEventListener("click", function () {settingHandler(0,1);});
 		document.getElementById("landscape").addEventListener("click", function () {settingHandler(1,0);});
 		document.getElementById("portrait").addEventListener("click", function () {settingHandler(1,1);});
 		document.getElementById("begin").addEventListener("click", initSlideshow);
-		$('[data-toggle="popover"]').popover() // init "about" popover
 	});
 };
 
@@ -58,14 +62,15 @@ function initSlideshow() {
 	}
 
 	// load slideshow content and add event listeners
-	$("#nav").load("content/navSession.html");
-	$("#content").load("content/contentSession.html", function() {
-		loadNextImage();
-		document.getElementById("forward").addEventListener("click",forward);
-		document.getElementById("backward").addEventListener("click",backward);
-		document.getElementById("pause").addEventListener("click",pause);
-		document.getElementById("end").addEventListener("click", function(){
-			location.reload();
+	$("#nav").load("content/navSession.html", function() {
+		$("#content").load("content/contentSession.html", function() {
+			loadNextImage();
+			document.getElementById("forward").addEventListener("click",forward);
+			document.getElementById("backward").addEventListener("click",backward);
+			document.getElementById("pause").addEventListener("click",pause);
+			document.getElementById("end").addEventListener("click", function(){
+				location.reload();
+			});
 		});
 	});
 };
@@ -115,6 +120,7 @@ function settingHandler(type, value) {
 
 function newQueue(length) {
 	// creates a randomized queue (array) of image IDs
+
 	var queue = [];
 	for (var i = 1; i <= length; i++) {
 		queue[queue.length] = i;
@@ -134,8 +140,6 @@ function loadNextImage() {
 	session.time = settings.delay;
 
 	// inital render
-	console.log("image index: " + session.index);
-	console.log(session.time);
 	drawTime();
 	var imgstr = "img/" + settings.sessionTypeID + "/" + session.queue[session.index] + ".jpg";
 	$("#imgContent").attr("src","");
@@ -147,11 +151,12 @@ function loadNextImage() {
 
 function tick() {
 	if (session.time > 0) { // if time is left on image
-		console.log(--session.time); // decrement and rerender
+		// decrement and rerender time
+		session.time--;
 		drawTime();
 	}
 	else { // (timer ran out)
-		forward();
+		forward(); // load next image in queue
 	}
 }
 
@@ -195,3 +200,5 @@ function drawTime() {
 	if (seconds < 10) seconds = "0" + seconds;
 	$("#time").text(minutes + ":" + seconds);
 }
+
+})();
